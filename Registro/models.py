@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 class Usuario(AbstractUser):
-    """Modelo personalizado de usuario para la plataforma de competencia de robots"""
-    nombre_completo = models.CharField(max_length=255)
+    matricula = models.CharField(max_length=255)
     correo_electronico = models.EmailField(unique=True)
     numero_telefono = models.CharField(max_length=15, unique=True)
     es_administrador = models.BooleanField(default=False)
@@ -16,9 +15,24 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.correo_electronico
+    
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='registro_users',  
+        blank=True,
+        verbose_name='groups',
+        help_text='The groups this user belongs to.'
+    )
+    
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='registro_users_permissions',  
+        blank=True,
+        verbose_name='user permissions',
+        help_text='Specific permissions for this user.'
+    )
 
 class Robot(models.Model):
-    """Modelo que representa un robot en la competencia"""
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     peso = models.FloatField()
@@ -33,7 +47,6 @@ class Robot(models.Model):
         ordering = ['-fecha_registro']
 
 class Torneo(models.Model):
-    """Modelo que representa un torneo"""
     nombre = models.CharField(max_length=200)
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
@@ -49,7 +62,6 @@ class Torneo(models.Model):
         ordering = ['-fecha_inicio']
 
 class Ronda(models.Model):
-    """Modelo que representa una ronda dentro de un torneo"""
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='rondas')
     numero_ronda = models.IntegerField()
     hora_inicio = models.DateTimeField()
@@ -64,7 +76,6 @@ class Ronda(models.Model):
         unique_together = ['torneo', 'numero_ronda']
 
 class Match(models.Model):
-    """Modelo que representa un encuentro entre dos robots"""
     ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
     robot1 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot1')
     robot2 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot2')
@@ -81,7 +92,6 @@ class Match(models.Model):
         ordering = ['hora_programada']
 
 class Notificacion(models.Model):
-    """Modelo que representa notificaciones para los matches"""
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='notificaciones')
     mensaje = models.TextField()
     programada_para = models.DateTimeField()
@@ -92,7 +102,6 @@ class Notificacion(models.Model):
         return f"Notificación para {self.match}"
 
     def enviar(self):
-        """Marcar notificación como enviada"""
         self.esta_enviada = True
         self.fecha_envio = timezone.now()
         self.save()

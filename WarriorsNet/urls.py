@@ -20,6 +20,6 @@ from Registro import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.helloworld),
-    path('signup/', views.helloworld),
+    path('formulario/', views.formulario, name='formulario'),
+    path('', views.home, name='home'),
 ]
