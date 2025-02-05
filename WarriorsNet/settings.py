@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-u!2$a=09l4kh*i#)n_1t40#&z6-vi8ieup45owen6(hys4oo+h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =  True
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'Registro.Usuario'
 
 # Application definition
 
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'tailwind',
     'Registro'
 ]
 

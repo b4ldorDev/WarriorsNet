@@ -1,14 +1,15 @@
-<form method="POST">
-    {% csrf_token%}
-    <label for"matricula">Ingrese su matricula</label>
-    <input type="text" name="matricula" required> 
-
-    <label for="correo_electronico"> ingrese su correo</label>
-    <input type="email" name="correo_electronico" required> 
- 
-    <label for="numero_telefono">Número de teléfono: <small>(Formato: 712-345-6789)</small></label>        
-    <input type="tel" name="numero_telefono"  pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-
-    <input type="submit" value="Enviar">
-    
+<form method="POST" action='{% url 'formulario'%}'>
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Registrar Robot</button>
 </form>

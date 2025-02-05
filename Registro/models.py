@@ -3,34 +3,10 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 class Usuario(AbstractUser):
-    matricula = models.CharField(max_length=255)
-    correo_electronico = models.EmailField(unique=True)
-    numero_telefono = models.CharField(max_length=15, unique=True)
-    es_administrador = models.BooleanField(default=False)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    name_robot = models.CharField(max_length=50)
+    correo_electronico  = models.EmailField(unique=True)
 
-    class Meta:
-        verbose_name = 'usuario'
-        verbose_name_plural = 'usuarios'
-
-    def __str__(self):
-        return self.correo_electronico
-    
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='registro_users',  
-        blank=True,
-        verbose_name='groups',
-        help_text='The groups this user belongs to.'
-    )
-    
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='registro_users_permissions',  
-        blank=True,
-        verbose_name='user permissions',
-        help_text='Specific permissions for this user.'
-    )
+#No sé luego lo hago chido 
 
 class Robot(models.Model):
     nombre = models.CharField(max_length=100)

@@ -19,7 +19,7 @@ from django.urls import path
 from Registro import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='home'),
+    #path('', views.home, name='home'),
     path('formulario/', views.formulario, name='formulario'),
-    path('', views.home, name='home'),
 ]
