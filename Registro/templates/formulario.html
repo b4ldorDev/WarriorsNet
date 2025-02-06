@@ -20,7 +20,7 @@
 
     {% for field in form %}
         <div class="form-group">
-            {{ field.label_tag }}  {# Label for the field #}
+            {{ field.label_tag }}  
 
             {% if field.field.widget.input_type == 'checkbox' %}
                 <div class="form-check">
@@ -28,12 +28,12 @@
                     <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 </div>
             {% else %}
-                {{ field }}  {# The form field itself #}
+                {{ field }}  
             {% endif %}
 
-            {% if field.errors %}  {# Check for errors *for this specific field* #}
+            {% if field.errors %}  
                 <div class="invalid-feedback">
-                    {% for error in field.errors %}  {# Iterate through the errors for this field #}
+                    {% for error in field.errors %}  
                         {{ error }}
                     {% endfor %}
                 </div>
