@@ -10,8 +10,10 @@ from django.contrib import messages
 def home(request):
     return render(request, 'home.html')
 
+def torneo(request): 
+    return render(request, 'torneo.html')
+
 def formulario(request):
-    """Vista para el formulario de registro de robots"""
     if request.method == 'GET':
         form = RobotRegistrationForm()
         return render(request, 'formulario.html', {'form': form})

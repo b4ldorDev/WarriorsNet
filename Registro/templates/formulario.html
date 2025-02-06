@@ -1,3 +1,7 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
@@ -48,3 +52,5 @@
         $('.messages').fadeOut('slow');
     }, 5000);
 </script>
+
+{% endblock %}

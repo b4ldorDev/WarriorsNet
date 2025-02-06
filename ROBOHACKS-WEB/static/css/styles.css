@@ -1,0 +1,94 @@
+/* styles.css */
+
+/* Estilos generales */
+body {
+    font-family: sans-serif;
+    background-color: #f8f9fa; /* Un fondo gris claro */
+}
+
+.container {
+    margin-top: 50px; /* Espacio superior para el formulario */
+}
+
+/* Estilos para los mensajes */
+.messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    opacity: 0.9; /* Reduce un poco la opacidad del alert */
+}
+
+.alert-success {
+    background-color: #d4edda; /* Verde claro para éxito */
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da; /* Rojo claro para error */
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+.alert-warning {
+    background-color: #fff3cd; /* Amarillo claro para advertencia */
+    border-color: #ffeeba;
+    color: #856404;
+}
+.alert-info {
+    background-color: #d1ecf1; /* Azul claro para información */
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+/* Estilos para el formulario */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ced4da; /* Borde gris claro */
+}
+
+.form-check {
+    margin-bottom: 15px; /* Margen inferior para los checkboxes */
+}
+
+.invalid-feedback {
+    color: #dc3545; /* Rojo para los mensajes de error */
+    font-size: 14px;
+    margin-top: 5px;
+}
+.form-text{
+    font-size: 14px;
+}
+
+
+/* Estilos para el botón */
+.btn-primary {
+    background-color: #007bff; /* Azul */
+    border-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Transición suave al pasar el mouse */
+}
+
+.btn-primary:hover {
+    background-color: #0069d9; /* Azul más oscuro al pasar el mouse */
+    border-color: #0062cc;
+}
+
+/* Responsive design (opcional) */
+@media (max-width: 768px) {
+    .container {
+        margin-top: 20px;
+    }
+}
