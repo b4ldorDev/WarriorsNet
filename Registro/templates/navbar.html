@@ -25,6 +25,11 @@
       >
         <a class="nav-link" href="{% url 'formulario' %}">Formulario</a>
       </li>
+      <li
+        class="nav-item {% if request.resolver_match.view_name == 'matches' %}active{% endif %}"
+      >
+        <a class="nav-link" href="{% url 'matches' %}">matches</a>
+      </li>    
     </ul>
   </div>
 </nav>

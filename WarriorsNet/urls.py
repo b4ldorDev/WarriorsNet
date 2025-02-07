@@ -24,4 +24,6 @@ urlpatterns = [
     path('home/', views.home, name='home'), 
     path('formulario/', views.formulario, name='formulario'), 
     path('torneo/', views.torneo, name='torneo'),  
+    path('matches/', views.match_list, name='matches'),  
+    path('bracket/<int:torneo_id>/', views.ver_bracket, name='ver_bracket'),    
 ]

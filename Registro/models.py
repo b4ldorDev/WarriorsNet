@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.db import transaction
 
 class Usuario(AbstractUser):
     name_robot = models.CharField(max_length=50)
@@ -31,6 +32,37 @@ class Torneo(models.Model):
     esta_activo = models.BooleanField(default=True)
     administrador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='torneos_administrados')
 
+    def generar_rondas(self, robots):
+
+        self.rondas.all().delete()
+    
+        num_rondas = len(robots).bit_length() - 1
+    
+        with transaction.atomic():
+            for n_ronda in range(1, num_rondas + 1):
+                ronda = Ronda.objects.create(
+                    torneo=self,
+                    numero_ronda=n_ronda,
+                    hora_inicio=timezone.now(),
+                    hora_fin=timezone.now(),
+                )
+            
+                if n_ronda == 1:
+                    robots_mezclados = list(robots)
+                    random.shuffle(robots_mezclados)
+                
+                    for i in range(0, len(robots_mezclados), 2):
+                        robot1 = robots_mezclados[i]
+                        robot2 = robots_mezclados[i+1] if i+1 < len(robots_mezclados) else None
+                    
+                        Match.objects.create(
+                            ronda=ronda,
+                            robot1=robot1,
+                            robot2=robot2,
+                            hora_programada=timezone.now(),
+                        )
+
+
     def __str__(self):
         return self.nombre
 
@@ -50,6 +82,8 @@ class Ronda(models.Model):
     class Meta:
         ordering = ['numero_ronda']
         unique_together = ['torneo', 'numero_ronda']
+
+
 
 class Match(models.Model):
     ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
@@ -84,3 +118,14 @@ class Notificacion(models.Model):
 
     class Meta:
         ordering = ['programada_para']
+
+#Funciones 
+
+# Con esto muestro el diagrama ese de los batallas 
+def ver_bracket(request, torneo_id):
+    torneo = Torneo.objects.get(id=torneo_id)
+    rondas = torneo.rondas.all().prefetch_related('matches')
+    context = {'torneo': torneo, 'rondas': rondas}
+    return render(request, 'torneos/bracket.html', context)
+
+

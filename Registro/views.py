@@ -2,16 +2,44 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.forms import UserCreationForm 
 from django.contrib.auth.models import User 
 from . forms import RobotRegistrationForm
-from . models import Usuario
+from . models import Usuario, Match, Torneo, Ronda
 from django.db import IntegrityError
 from django.contrib import messages
-
+from django.db.models import Q
 
 def home(request):
     return render(request, 'home.html')
 
 def torneo(request): 
     return render(request, 'torneo.html')
+
+def ver_bracket(request, torneo_id):
+    torneo = Torneo.objects.get(id=torneo_id)
+    rondas = torneo.rondas.all().prefetch_related('matches')
+    
+    context = {
+        'torneo': torneo,
+        'rondas': rondas,
+    }
+    return render(request, 'torneos/bracket.html', context)
+
+def match_list(request):
+    search_query = request.GET.get('name_robot', '')
+
+    if search_query: 
+        matches = Match.objects.filter(            
+            Q(robot1__name__icontains=search_query) | 
+            Q(robot2__name__icontains=search_query)
+        ).order_by('hora_programada ')
+    else: 
+        matches = Match.objects.all().order_by('hora_programada')
+
+    context = {
+        'matches' : matches,
+        'search_query': search_query  
+    }
+
+    return render(request, 'torneos/match_list.html', context)
 
 def formulario(request):
     if request.method == 'GET':
