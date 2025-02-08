@@ -5,52 +5,50 @@
 {% if messages %}
 <div class="messages">
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    <div class="alert alert-{{ message.tags }}" role="alert">
         {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
     </div>
     {% endfor %}
 </div>
 {% endif %}
 
-<form method="POST">
-    {% csrf_token %}
+<div class="tech-form-container">
+    <form method="POST" class="tech-form">
+        {% csrf_token %}
 
-    {% for field in form %}
-        <div class="form-group">
-            {{ field.label_tag }}  {# Label for the field #}
+        {% for field in form %}
+            <div class="tech-form-group">
+                {{ field.label_tag }}  
 
-            {% if field.field.widget.input_type == 'checkbox' %}
-                <div class="form-check">
-                    {{ field }}
-                    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                </div>
-            {% else %}
-                {{ field }}  {# The form field itself #}
-            {% endif %}
+                {% if field.field.widget.input_type == 'checkbox' %}
+                    <div class="tech-form-check">
+                        {{ field }}
+                        <label class="tech-check-label" for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                    </div>
+                {% else %}
+                    <div class="tech-input-wrapper">
+                        {{ field }}
+                    </div>
+                {% endif %}
 
-            {% if field.errors %}  {# Check for errors *for this specific field* #}
-                <div class="invalid-feedback">
-                    {% for error in field.errors %}  {# Iterate through the errors for this field #}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-            {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-            {% endif %}
-        </div>
-    {% endfor %}
+                {% if field.errors %}  
+                    <div class="tech-error-feedback">
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                {% if field.help_text %}
+                    <small class="tech-help-text">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
 
-    <button type="submit" class="btn btn-primary">Registrar Robot</button>
-</form>
-
-<script>
-    setTimeout(function() {
-        $('.messages').fadeOut('slow');
-    }, 5000);
-</script>
+        <button type="submit" class="tech-submit-btn">Registrar Robot</button>
+    </form>
+</div>
 
 {% endblock %}

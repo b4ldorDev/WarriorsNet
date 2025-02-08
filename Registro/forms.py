@@ -39,7 +39,7 @@ class RobotRegistrationForm(forms.Form):
     def clean_correo_electronico(self):
         """Validación personalizada para el correo electrónico"""
         email = self.cleaned_data.get('correo_electronico')
-        if email and not email.endswith('@tec.mx'):
+        if email and not email.endswith('@'):
             raise ValidationError('El correo electrónico debe ser institucional (@tec.mx)')
         return email
 
