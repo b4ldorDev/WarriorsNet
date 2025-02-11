@@ -54,10 +54,10 @@ def formulario(request):
             return render(request, 'formulario.html', {'form': form})
             
         correo = form.cleaned_data['correo_electronico']
-        
-        if not correo.endswith('@tec.mx'):
-            messages.error(request, 'El correo debe ser institucional (@tec.mx)')
-            return render(request, 'formulario.html', {'form': form})
+        # Por el momento se utilizaran todos los correos 
+        #if not correo.endswith('@tec.mx'):
+        #    messages.error(request, 'El correo debe ser institucional (@tec.mx)')
+        #    return render(request, 'formulario.html', {'form': form})
             
         try:
             user = Usuario.objects.create_user(
