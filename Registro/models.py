@@ -2,10 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.db import transaction
+import random
 
 class Usuario(AbstractUser):
-    name_robot = models.CharField(max_length=50)
-    correo_electronico  = models.EmailField(unique=True)
+    name_robot = models.CharField(max_length=100)
+    matricula = models.CharField(max_length=9, null=True, blank=True)
+    correo_electronico = models.EmailField(unique=True)
+    is_tec_student = models.BooleanField(default=False)
 
 #No sé luego lo hago chido 
 
@@ -16,7 +19,7 @@ class Robot(models.Model):
     categoria = models.CharField(max_length=50)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='robots')
     fecha_registro = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
         return f"{self.nombre} ({self.categoria})"
 
@@ -32,42 +35,110 @@ class Torneo(models.Model):
     esta_activo = models.BooleanField(default=True)
     administrador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='torneos_administrados')
 
-    def generar_rondas(self, robots):
-
-        self.rondas.all().delete()
-    
-        num_rondas = len(robots).bit_length() - 1
-    
-        with transaction.atomic():
-            for n_ronda in range(1, num_rondas + 1):
-                ronda = Ronda.objects.create(
-                    torneo=self,
-                    numero_ronda=n_ronda,
-                    hora_inicio=timezone.now(),
-                    hora_fin=timezone.now(),
-                )
-            
-                if n_ronda == 1:
-                    robots_mezclados = list(robots)
-                    random.shuffle(robots_mezclados)
-                
-                    for i in range(0, len(robots_mezclados), 2):
-                        robot1 = robots_mezclados[i]
-                        robot2 = robots_mezclados[i+1] if i+1 < len(robots_mezclados) else None
-                    
-                        Match.objects.create(
-                            ronda=ronda,
-                            robot1=robot1,
-                            robot2=robot2,
-                            hora_programada=timezone.now(),
-                        )
-
 
     def __str__(self):
         return self.nombre
 
     class Meta:
         ordering = ['-fecha_inicio']
+
+    def generar_rondas(self):
+        """Genera las rondas y matches del torneo automáticamente."""
+        robots = list(Robot.objects.filter(
+            matches_como_robot1__ronda__torneo=self
+        ).distinct())
+        
+        if len(robots) < 2:
+            raise ValueError("Se necesitan al menos 2 robots para generar las rondas")
+
+        with transaction.atomic():
+            # Eliminar rondas existentes
+            self.rondas.all().delete()
+            
+            # Calcular número de rondas necesarias
+            num_robots = len(robots)
+            num_rondas = (num_robots - 1).bit_length()
+            
+            # Generar primera ronda
+            primera_ronda = Ronda.objects.create(
+                torneo=self,
+                numero_ronda=1,
+                hora_inicio=self.fecha_inicio,
+                hora_fin=self.fecha_inicio + timezone.timedelta(hours=2)
+            )
+            
+            # Mezclar robots aleatoriamente
+            random.shuffle(robots)
+            
+            # Crear matches de primera ronda
+            matches_primera_ronda = []
+            for i in range(0, len(robots), 2):
+                if i + 1 < len(robots):
+                    match = Match.objects.create(
+                        ronda=primera_ronda,
+                        robot1=robots[i],
+                        robot2=robots[i + 1],
+                        hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
+                    )
+                    matches_primera_ronda.append(match)
+                else:
+                    # Si hay número impar de robots, el último pasa automáticamente
+                    match = Match.objects.create(
+                        ronda=primera_ronda,
+                        robot1=robots[i],
+                        robot2=None,
+                        ganador=robots[i],
+                        esta_completo=True,
+                        hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
+                    )
+                    matches_primera_ronda.append(match)
+            
+            # Generar rondas subsecuentes
+            for num_ronda in range(2, num_rondas + 1):
+                nueva_ronda = Ronda.objects.create(
+                    torneo=self,
+                    numero_ronda=num_ronda,
+                    hora_inicio=self.fecha_inicio + timezone.timedelta(days=num_ronda-1),
+                    hora_fin=self.fecha_inicio + timezone.timedelta(days=num_ronda-1, hours=2)
+                )
+                
+                # Crear matches vacíos para rondas posteriores
+                num_matches = len(matches_primera_ronda) // 2
+                for i in range(num_matches):
+                    Match.objects.create(
+                        ronda=nueva_ronda,
+                        robot1=None,
+                        robot2=None,
+                        hora_programada=nueva_ronda.hora_inicio + timezone.timedelta(minutes=30 * i)
+                    )
+
+def actualizar_bracket(match):
+    """Actualiza el bracket cuando se completa un match."""
+    if not match.esta_completo or not match.ganador:
+        return
+        
+    ronda_actual = match.ronda
+    siguiente_ronda = Ronda.objects.filter(
+        torneo=ronda_actual.torneo,
+        numero_ronda=ronda_actual.numero_ronda + 1
+    ).first()
+    
+    if siguiente_ronda:
+        # Encontrar el match correspondiente en la siguiente ronda
+        matches_actuales = list(match.ronda.matches.order_by('id'))
+        indice_actual = matches_actuales.index(match)
+        siguiente_indice = indice_actual // 2
+        
+        siguiente_match = siguiente_ronda.matches.all().order_by('id')[siguiente_indice]
+        
+        # Asignar el ganador al siguiente match
+        if indice_actual % 2 == 0:
+            siguiente_match.robot1 = match.ganador
+        else:
+            siguiente_match.robot2 = match.ganador
+        
+        siguiente_match.save()
+
 
 class Ronda(models.Model):
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='rondas')

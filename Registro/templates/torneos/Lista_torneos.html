@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">{{ titulo }}</h1>
+    
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for torneo in torneos %}
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-xl font-semibold mb-2">{{ torneo.nombre }}</h2>
+                <p class="text-gray-600 mb-4">{{ torneo.descripcion|truncatewords:30 }}</p>
+                
+                <div class="text-sm text-gray-500 mb-4">
+                    <div>Inicio: {{ torneo.fecha_inicio|date:"d/m/Y H:i" }}</div>
+                    <div>Fin: {{ torneo.fecha_fin|date:"d/m/Y H:i" }}</div>
+                    <div>Ubicación: {{ torneo.ubicacion }}</div>
+                </div>
+                
+                <a href="{% url 'panel_jurado' torneo_id=torneo.id %}" 
+                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                    Acceder al Panel →
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-8">
+            <p class="text-gray-600 text-lg">No hay torneos activos en este momento.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

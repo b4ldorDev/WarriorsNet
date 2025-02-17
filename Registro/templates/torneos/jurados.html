@@ -1,0 +1,84 @@
+<!-- torneos/panel_jurado.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Panel de Jurado - {{ torneo.nombre }}</h1>
+    <h2 class="text-xl mb-4">Ronda {{ ronda_actual.numero_ronda }}</h2>
+    
+    <div class="grid md:grid-cols-2 gap-6">
+        {% for match, form in matches_con_forms %}
+        <div class="match-card border rounded-lg p-6 bg-white shadow-sm">
+            <h3 class="text-lg font-semibold mb-4">Match #{{ forloop.counter }}</h3>
+            
+            <div class="match-info mb-4">
+                <div class="robot1 text-lg">{{ match.robot1.nombre }}</div>
+                {% if match.robot2 %}
+                <div class="vs text-gray-500 my-2">VS</div>
+                <div class="robot2 text-lg">{{ match.robot2.nombre }}</div>
+                {% else %}
+                <div class="text-gray-500 my-2">Pase automático</div>
+                {% endif %}
+            </div>
+            
+            {% if match.robot2 %}
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="match_id" value="{{ match.id }}">
+                
+                <div class="ganador-selection">
+                    <label class="block text-sm font-medium mb-2">Seleccionar Ganador:</label>
+                    {{ form.ganador }}
+                </div>
+                
+                <div class="descripcion">
+                    <label class="block text-sm font-medium mb-2">Descripción del Resultado:</label>
+                    {{ form.descripcion_resultado }}
+                </div>
+                
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Registrar Resultado
+                </button>
+            </form>
+            {% else %}
+            <div class="text-gray-600">
+                {{ match.robot1.nombre }} avanza automáticamente
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="col-span-2 text-center py-8">
+            <p class="text-lg text-gray-600">No hay matches pendientes en esta ronda.</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-8">
+        <a href="{% url 'ver_bracket' torneo.id %}" class="text-blue-600 hover:text-blue-800">
+            Ver Bracket Completo →
+        </a>
+    </div>
+</div>
+
+<style>
+    .match-card {
+        transition: all 0.3s ease;
+    }
+    
+    .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    input[type="radio"] {
+        margin-right: 0.5rem;
+    }
+    
+    textarea {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        padding: 0.5rem;
+    }
+</style>
+{% endblock %}

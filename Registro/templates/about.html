@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="cyber-title text-center">Warriors Net</h1>
+            <p class="lead text-center" style="color: #00bfe7;">Donde la tecnología y la competencia se encuentran</p>
+        </div>
+    </div>
+
+    <!-- Carousel Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div id="robotCarousel" class="carousel slide cyber-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="2"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="/api/placeholder/800/400" class="d-block w-100" alt="Robot 1">
+                        <div class="carousel-caption cyber-caption">
+                            <h3>Competencias de Robótica</h3>
+                            <p>Desafíos emocionantes que ponen a prueba la innovación</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/api/placeholder/800/400" class="d-block w-100" alt="Robot 2">
+                        <div class="carousel-caption cyber-caption">
+                            <h3>Tecnología de Punta</h3>
+                            <p>Utilizando lo último en robótica y automatización</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/api/placeholder/800/400" class="d-block w-100" alt="Robot 3">
+                        <div class="carousel-caption cyber-caption">
+                            <h3>Comunidad Activa</h3>
+                            <p>Un espacio para compartir conocimiento y experiencias</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#robotCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#robotCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objetivo Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="cyber-card">
+                <h2>Objetivo</h2>
+                <p>Warriors Net surge como una plataforma innovadora diseñada para revolucionar la manera en que se organizan y gestionan las competencias de robótica. Nuestro objetivo principal es crear un ecosistema digital que facilite la participación, seguimiento y evaluación de torneos robóticos, proporcionando una experiencia única tanto para participantes como para espectadores.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Participaciones Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="cyber-card">
+                <h2>Participaciones</h2>
+                <ul class="cyber-list">
+                    <li>Más de 50 torneos organizados exitosamente</li>
+                    <li>500+ robots registrados en nuestra plataforma</li>
+                    <li>Participantes de 25 diferentes instituciones educativas</li>
+                    <li>Colaboraciones con empresas líderes en tecnología</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="cyber-card">
+                <h2>Logros</h2>
+                <ul class="cyber-list">
+                    <li>Premio a la Innovación Tecnológica 2024</li>
+                    <li>Reconocimiento por fomento a la robótica educativa</li>
+                    <li>Certificación de excelencia en gestión de torneos</li>
+                    <li>Alianzas estratégicas con instituciones internacionales</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cyber-title {
+        font-size: 3.5rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(90deg, #00bfe7, #302b63);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(0, 191, 231, 0.5);
+    }
+
+    .cyber-card {
+        background: rgba(48, 43, 99, 0.3);
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        backdrop-filter: blur(8px);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 191, 231, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .cyber-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0, 191, 231, 0.2);
+    }
+
+    .cyber-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .cyber-list li {
+        padding: 0.5rem 0;
+        color: #e0e0e0;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .cyber-list li:before {
+        content: '►';
+        position: absolute;
+        left: 0;
+        color: #00bfe7;
+        font-size: 0.8rem;
+    }
+
+    .cyber-carousel {
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(0, 191, 231, 0.2);
+    }
+
+    .cyber-caption {
+        background: rgba(15, 12, 41, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        border-radius: 5px;
+        padding: 1.5rem;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 191, 231, 0.1);
+        border: none;
+    }
+
+    .carousel-indicators button {
+        background-color: #00bfe7;
+        opacity: 0.5;
+    }
+
+    .carousel-indicators button.active {
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        .cyber-title {
+            font-size: 2.5rem;
+        }
+
+        .cyber-card {
+            padding: 1.5rem;
+        }
+
+        .cyber-caption {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card" style="background: rgba(48, 43, 99, 0.3); backdrop-filter: blur(8px);">
+                <div class="card-body p-5">
+                    <h1 class="text-center mb-4">Iniciar Sesión</h1>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert" style="background: rgba(231, 0, 0, 0.1); border: 1px solid rgba(231, 0, 0, 0.3); color: #ff4444;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Usuario</label>
+                            <input type="text" name="username" 
+                                   class="form-control"
+                                   required
+                                   style="background: rgba(48, 43, 99, 0.3); color: #ffffff; border: 1px solid rgba(0, 191, 231, 0.2);">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" name="password"
+                                   class="form-control"
+                                   required
+                                   style="background: rgba(48, 43, 99, 0.3); color: #ffffff; border: 1px solid rgba(0, 191, 231, 0.2);">
+                        </div>
+                        
+                        <button type="submit" 
+                                class="btn btn-primary w-100"
+                                style="background: linear-gradient(90deg, #302b63, #24243e); border: 1px solid #00bfe7; font-family: 'Play', sans-serif; text-transform: uppercase; position: relative; overflow: hidden;">
+                            Ingresar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        background: rgba(48, 43, 99, 0.5) !important;
+        border-color: #00bfe7 !important;
+        box-shadow: 0 0 15px rgba(0, 191, 231, 0.2) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #24243e, #302b63) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 191, 231, 0.3);
+    }
+
+    .card {
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        box-shadow: 0 0 20px rgba(0, 191, 231, 0.1);
+    }
+
+    h1::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 70%;
+        background: linear-gradient(180deg, #00bfe7, transparent);
+    }
+
+    .form-label {
+        color: #00bfe7;
+        font-family: "Play", sans-serif;
+        text-shadow: 0 0 10px rgba(0, 191, 231, 0.3);
+    }
+</style>
+{% endblock %}

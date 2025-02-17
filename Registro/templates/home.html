@@ -1,7 +1,202 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 <div class="container">
-  <h1>Home</h1>
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="cyber-title text-center"> The Warriors </h1>
+            <p class="lead text-center" style="color: #00bfe7;">"Guerreros de la robótica: desaando límites, conquistando el podio."</p>
+        </div>
+    </div>
+
+    <!-- Carousel Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div id="robotCarousel" class="carousel slide cyber-carousel" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="0" class="active"></button>
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="1"></button>
+                    <button type="button" data-bs-target="#robotCarousel" data-bs-slide-to="2"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <img src="{% static 'images/Issac.jpeg' %}" class="d-block w-100" alt="Robot 1">
+                      <div class="carousel-caption cyber-caption">
+                            <h3>Competencias de Robótica</h3>
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                      <img src="{% static 'images/noche_de_las_estrellas.jpeg' %}" class="d-block w-100" alt="Robot 2">
+                      <div class="carousel-caption cyber-caption">
+                            <h3>Divulgación Cientifica </h3>
+                            <p>Noche de las estrellas</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                      <img src="{% static 'images/teus.jpeg' %}" class="d-block w-100" alt="Robot 3">
+                      <div class="carousel-caption cyber-caption">
+                            <h3>Representamos al Tec de Monterrey</h3>
+                            <p>Campus Toluca</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#robotCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#robotCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Objetivo Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="cyber-card">
+                <h2>¿Quienes somos?</h2>
+                <p>Nosotros somos un grupo estudiantil del Tecnológico de Monterrey Campus Toluca
+                  apasionado por la robótica y la tecnología, donde la colaboración, el liderazgo, la
+                  comunicación y el compromiso son los pilares fundamentales que guían su camino hacia el
+                  éxito. En cada competencia y desafío, los miembros de "WARRIORS" demuestran su
+                  capacidad para trabajar en equipo, liderar con habilidad, comunicarse ecazmente y
+                  comprometerse con sus objetivos.</p>
+              </div>
+        </div>
+    </div>
+
+    <!-- Participaciones Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="cyber-card">
+                <h2>Participaciones</h2>
+                <ul class="cyber-list">
+                    <li>Participación del grupo estudiantil en la noche de estrellas celebrado en el centro
+                      cultural mexiquense el 9 de noviembre de 2024 que fue un evento inolvidable, lleno
+                      de emoción, ciencia y mucha aventura, donde el grupo hizo una simulación
+                      espectacular del despegue de un cohete.</li>
+                    <li>En el torneo internacional RoboChallenge Romania 15th edition”, que se realizó del
+                      1 al 3 de noviembre de 2024 en Bucarest se quedó en Dieciseisavos de nal en la
+                      categoría de guerra de robots de 3 libras, en la minisumo autónomo profesional y
+                      microsumo autónomo profesional.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="cyber-card">
+                <h2>Ultimos Logros</h2>
+                <ul class="cyber-list">
+                    <li>Participación el torneo de Robótica X-MAS realizado en ESIME Azcapotzalco IPN
+                      donde se consiguió un 3er lugar en la categoría Guerra de robots 3lb, así mismo. LA
+                      acreditación para poder el torneo Robochallenge que se realizara en Rumania 2025.</li>
+                    <li>Participación en la olimpiada de ciencia y tecnología realizada en la Universidad
+                      Tecnológica de Tlaxcala y MCI los días 15 y 16 de noviembre de 2024 donde se
+                      obtuvo un segundo lugar en la categoría de robot de combate de 3 libras con el
+                      prototipo Warro y un tercer lugar en la categoría de minisumo autónomo profesional
+                      con el prototipo Teus.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+    .cyber-title {
+        font-size: 3.5rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(90deg, #00bfe7, #302b63);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(0, 191, 231, 0.5);
+    }
+
+    .cyber-card {
+        background: rgba(48, 43, 99, 0.3);
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        backdrop-filter: blur(8px);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 191, 231, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .cyber-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0, 191, 231, 0.2);
+    }
+
+    .cyber-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .cyber-list li {
+        padding: 0.5rem 0;
+        color: #e0e0e0;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .cyber-list li:before {
+        content: '►';
+        position: absolute;
+        left: 0;
+        color: #00bfe7;
+        font-size: 0.8rem;
+    }
+
+    .cyber-carousel {
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(0, 191, 231, 0.2);
+    }
+
+    .cyber-caption {
+        background: rgba(15, 12, 41, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 191, 231, 0.2);
+        border-radius: 5px;
+        padding: 1.5rem;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 191, 231, 0.1);
+        border: none;
+    }
+
+    .carousel-indicators button {
+        background-color: #00bfe7;
+        opacity: 0.5;
+    }
+
+    .carousel-indicators button.active {
+        opacity: 1;
+    }
+
+    .carousel-item img {
+        width: 1000px; /* Ancho deseado */
+        height: 400px; /* Alto deseado */
+        object-fit: cover; /* o contain, o fill según tu preferencia */
+    }
+
+    @media (max-width: 768px) {
+        .cyber-title {
+            font-size: 2.5rem;
+        }
+
+        .cyber-card {
+            padding: 1.5rem;
+        }
+
+        .cyber-caption {
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
