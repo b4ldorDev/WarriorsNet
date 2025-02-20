@@ -3,7 +3,21 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .models import Usuario 
+from django.contrib.auth.forms import AuthenticationForm
 
+class CustomLoginForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Username'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Password'
+        })
+    )
 
 class RobotRegistrationForm(forms.Form):
     is_tec_student = forms.BooleanField(
@@ -12,7 +26,7 @@ class RobotRegistrationForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class' : 'form-check-input'})
     )    
     matricula = forms.CharField(
-        label='Matrícula',
+        label='Matrícula / Usuario(externos)',
         max_length=9,
         min_length=9,
         validators=[
@@ -40,10 +54,9 @@ class RobotRegistrationForm(forms.Form):
         label='Correo Electrónico',
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'ejemplo@tec.mx'
+            'placeholder': 'ejemplo@tec.mx /ejemplo@gmail.com '
         })
     )
-
 
     def clean_name_robot(self):
         name = self.cleaned_data.get('name_robot')
@@ -51,14 +64,29 @@ class RobotRegistrationForm(forms.Form):
             raise ValidationError('El nombre del robot debe tener al menos 3 caracteres')
         return name.strip()
 
+    def clean_matricula(self):
+        matricula = self.cleaned_data.get('matricula')
+        is_tec_student = self.cleaned_data.get('is_tec_student')
+        if is_tec_student:
+            if not matricula.startswith('A'):
+                raise ValidationError('La matrícula debe comenzar con la letra A')
+            if not matricula[1:].isdigit():
+                raise ValidationError('Los últimos 8 caracteres deben ser números')
+        return matricula
+    
+    def clean_correo_electronico(self):
+        email = self.cleaned_data.get('correo_electronico')
+        is_tec_student = self.cleaned_data.get('is_tec_student')
+        if is_tec_student and not email.endswith('@tec.mx'):
+            raise ValidationError('El correo electrónico debe ser institucional (@tec.mx)')
+        return email
 
     def Meta(self):
         model = Usuario
         fields = ['name_robot', 'matricula', 'correo_electronico', 'is_tec_student']
     
-    
     def clean(self):
-        clean_data = super().clean()
+        cleaned_data = super().clean()
         is_tec_student = cleaned_data.get('is_tec_student')
         matricula = cleaned_data.get('matricula')
         if is_tec_student and not matricula: 
@@ -67,7 +95,7 @@ class RobotRegistrationForm(forms.Form):
             )
             
         if not is_tec_student:
-            cleaned_data['matricula']= None
+            cleaned_data['matricula'] = None
         return cleaned_data
 
 class JuradoMatchForm(forms.Form):
@@ -87,21 +115,3 @@ class JuradoMatchForm(forms.Form):
         if match.robot2:
             choices.append((match.robot2.id, match.robot2.nombre))
         self.fields['ganador'].queryset = Robot.objects.filter(id__in=[c[0] for c in choices])
-
-
-"""
-    def clean_matricula(self):
-        matricula = self.cleaned_data.get('matricula')
-        if matricula:
-            if not matricula.startswith('A'):
-                raise ValidationError('La matrícula debe comenzar con la letra A')
-            if not matricula[1:].isdigit():
-                raise ValidationError('Los últimos 8 caracteres deben ser números')
-        return matricula
-        
-    def clean_correo_electronico(self):
-        email = self.cleaned_data.get('correo_electronico')
-        if email and not email.endswith('@'):
-            raise ValidationError('El correo electrónico debe ser institucional (@tec.mx)')
-        return email
-"""
