@@ -9,7 +9,7 @@ class Usuario(AbstractUser):
     matricula = models.CharField(max_length=9, null=True, blank=True)
     correo_electronico = models.EmailField(unique=True)
     is_tec_student = models.BooleanField(default=False)
-
+    age = models.BooleanField(default=False)
 #No sé luego lo hago chido 
 
 class Robot(models.Model):
