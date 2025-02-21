@@ -11,7 +11,7 @@ class Usuario(AbstractUser):
     is_tec_student = models.BooleanField(default=False)
     profesional = models.BooleanField(default=False)
     junior = models.BooleanField(default=False)
-#No sé luego lo hago chido 
+    # No sé luego lo hago chido 
 
 class Robot(models.Model):
     nombre = models.CharField(max_length=100)
@@ -36,7 +36,6 @@ class Torneo(models.Model):
     esta_activo = models.BooleanField(default=True)
     administrador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='torneos_administrados')
 
-
     def __str__(self):
         return self.nombre
 
@@ -44,29 +43,26 @@ class Torneo(models.Model):
         ordering = ['-fecha_inicio']
 
     def generar_rondas(self):
-        """Genera las rondas y matches del torneo automáticamente."""
-        robots = list(Robot.objects.filter(
-            matches_como_robot1__ronda__torneo=self
-        ).distinct())
-        
-        if len(robots) < 2:
-            raise ValueError("Se necesitan al menos 2 robots para generar las rondas")
+        robots_profesional = list(Robot.objects.filter(categoria='PROFESIONAL', matches_como_robot1__ronda__torneo=self).distinct())
+        robots_junior = list(Robot.objects.filter(categoria='JUNIOR', matches_como_robot1__ronda__torneo=self).distinct())
 
+        for robots in [robots_profesional, robots_junior]:
+            if len(robots) < 2:
+                continue
+            self._crear_rondas_para_categoria(robots)
+
+    def _crear_rondas_para_categoria(self, robots):
         with transaction.atomic():
             self.rondas.all().delete()
-            
             num_robots = len(robots)
             num_rondas = (num_robots - 1).bit_length()
-            
             primera_ronda = Ronda.objects.create(
                 torneo=self,
                 numero_ronda=1,
                 hora_inicio=self.fecha_inicio,
                 hora_fin=self.fecha_inicio + timezone.timedelta(hours=2)
             )
-            
             random.shuffle(robots)
-            
             matches_primera_ronda = []
             for i in range(0, len(robots), 2):
                 if i + 1 < len(robots):
@@ -87,7 +83,6 @@ class Torneo(models.Model):
                         hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
                     )
                     matches_primera_ronda.append(match)
-            
             for num_ronda in range(2, num_rondas + 1):
                 nueva_ronda = Ronda.objects.create(
                     torneo=self,
@@ -95,7 +90,6 @@ class Torneo(models.Model):
                     hora_inicio=self.fecha_inicio + timezone.timedelta(days=num_ronda-1),
                     hora_fin=self.fecha_inicio + timezone.timedelta(days=num_ronda-1, hours=2)
                 )
-                
                 num_matches = len(matches_primera_ronda) // 2
                 for i in range(num_matches):
                     Match.objects.create(
@@ -129,7 +123,6 @@ def actualizar_bracket(match):
         
         siguiente_match.save()
 
-
 class Ronda(models.Model):
     torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='rondas')
     numero_ronda = models.IntegerField()
@@ -143,8 +136,6 @@ class Ronda(models.Model):
     class Meta:
         ordering = ['numero_ronda']
         unique_together = ['torneo', 'numero_ronda']
-
-
 
 class Match(models.Model):
     ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
@@ -185,5 +176,3 @@ def ver_bracket(request, torneo_id):
     rondas = torneo.rondas.all().prefetch_related('matches')
     context = {'torneo': torneo, 'rondas': rondas}
     return render(request, 'torneos/bracket.html', context)
-
-

@@ -58,18 +58,17 @@ class RobotRegistrationForm(forms.Form):
         })
     )
     
-    profesional = forms.BooleanField(
-        required=False,
-        label = 'Categoria Profesional',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
-
-    junior = forms.BooleanField(
-        required=False, 
-        label = 'Categoria Junior',
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    categoria = forms.ChoiceField(
+        label='Categoría',
+        choices=[('PROFESIONAL', 'Profesional'), ('JUNIOR', 'Junior')],
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
         
+    def clean_categoria(self):
+        categoria = self.cleaned_data.get('categoria')
+        if not categoria:
+            raise ValidationError('Debe seleccionar una categoría.')
+        return categoria
 
     def clean_name_robot(self):
         name = self.cleaned_data.get('name_robot')
