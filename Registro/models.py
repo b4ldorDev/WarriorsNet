@@ -9,7 +9,8 @@ class Usuario(AbstractUser):
     matricula = models.CharField(max_length=9, null=True, blank=True)
     correo_electronico = models.EmailField(unique=True)
     is_tec_student = models.BooleanField(default=False)
-    age = models.BooleanField(default=False)
+    profesional = models.BooleanField(default=False)
+    junior = models.BooleanField(default=False)
 #No sé luego lo hago chido 
 
 class Robot(models.Model):
@@ -52,14 +53,11 @@ class Torneo(models.Model):
             raise ValueError("Se necesitan al menos 2 robots para generar las rondas")
 
         with transaction.atomic():
-            # Eliminar rondas existentes
             self.rondas.all().delete()
             
-            # Calcular número de rondas necesarias
             num_robots = len(robots)
             num_rondas = (num_robots - 1).bit_length()
             
-            # Generar primera ronda
             primera_ronda = Ronda.objects.create(
                 torneo=self,
                 numero_ronda=1,
@@ -67,10 +65,8 @@ class Torneo(models.Model):
                 hora_fin=self.fecha_inicio + timezone.timedelta(hours=2)
             )
             
-            # Mezclar robots aleatoriamente
             random.shuffle(robots)
             
-            # Crear matches de primera ronda
             matches_primera_ronda = []
             for i in range(0, len(robots), 2):
                 if i + 1 < len(robots):
@@ -82,7 +78,6 @@ class Torneo(models.Model):
                     )
                     matches_primera_ronda.append(match)
                 else:
-                    # Si hay número impar de robots, el último pasa automáticamente
                     match = Match.objects.create(
                         ronda=primera_ronda,
                         robot1=robots[i],
@@ -93,7 +88,6 @@ class Torneo(models.Model):
                     )
                     matches_primera_ronda.append(match)
             
-            # Generar rondas subsecuentes
             for num_ronda in range(2, num_rondas + 1):
                 nueva_ronda = Ronda.objects.create(
                     torneo=self,
@@ -102,7 +96,6 @@ class Torneo(models.Model):
                     hora_fin=self.fecha_inicio + timezone.timedelta(days=num_ronda-1, hours=2)
                 )
                 
-                # Crear matches vacíos para rondas posteriores
                 num_matches = len(matches_primera_ronda) // 2
                 for i in range(num_matches):
                     Match.objects.create(
@@ -113,7 +106,6 @@ class Torneo(models.Model):
                     )
 
 def actualizar_bracket(match):
-    """Actualiza el bracket cuando se completa un match."""
     if not match.esta_completo or not match.ganador:
         return
         
@@ -124,14 +116,12 @@ def actualizar_bracket(match):
     ).first()
     
     if siguiente_ronda:
-        # Encontrar el match correspondiente en la siguiente ronda
         matches_actuales = list(match.ronda.matches.order_by('id'))
         indice_actual = matches_actuales.index(match)
         siguiente_indice = indice_actual // 2
         
         siguiente_match = siguiente_ronda.matches.all().order_by('id')[siguiente_indice]
         
-        # Asignar el ganador al siguiente match
         if indice_actual % 2 == 0:
             siguiente_match.robot1 = match.ganador
         else:
@@ -190,9 +180,6 @@ class Notificacion(models.Model):
     class Meta:
         ordering = ['programada_para']
 
-#Funciones 
-
-# Con esto muestro el diagrama ese de los batallas 
 def ver_bracket(request, torneo_id):
     torneo = Torneo.objects.get(id=torneo_id)
     rondas = torneo.rondas.all().prefetch_related('matches')

@@ -58,12 +58,18 @@ class RobotRegistrationForm(forms.Form):
         })
     )
     
-    edad = forms.BooleanField(
-        required=True,
-        label = 'mayor de 18 años',
+    profesional = forms.BooleanField(
+        required=False,
+        label = 'Categoria Profesional',
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
-    
+
+    junior = forms.BooleanField(
+        required=False, 
+        label = 'Categoria Junior',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+        
 
     def clean_name_robot(self):
         name = self.cleaned_data.get('name_robot')
