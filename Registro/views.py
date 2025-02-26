@@ -2,10 +2,12 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.forms import UserCreationForm 
 from django.contrib.auth.models import User 
 from . forms import RobotRegistrationForm
-from . models import Usuario, Match, Torneo, Ronda
+from . models import Usuario, Match, Torneo, Ronda, Robot
 from django.db import IntegrityError
 from django.contrib import messages
 from django.db.models import Q
+from django.contrib.auth.decorators import user_passes_test
+from django.db import transaction
 
 def home(request):
     return render(request, 'home.html')
@@ -47,27 +49,47 @@ def formulario(request):
         return render(request, 'formulario.html', {'form': form})
     
     elif request.method == 'POST':
-        form = RobotRegistrationForm(request.POST)
+        form = RobotRegistrationForm(request.POST, request.FILES)
         
         if not form.is_valid():
             messages.error(request, 'Por favor, verifica los datos ingresados.')
             return render(request, 'formulario.html', {'form': form})
             
         correo = form.cleaned_data['correo_electronico']
-        
-        if not correo.endswith('@tec.mx'):
-            messages.error(request, 'El correo debe ser institucional (@tec.mx)')
-            return render(request, 'formulario.html', {'form': form})
-            
+        name_robot = form.cleaned_data['name_robot']
+        categorias = form.cleaned_data['categorias']
+        comprobante_pago = form.cleaned_data['comprobante_pago']
+        matricula = form.cleaned_data['matricula'] if form.cleaned_data['matricula'] else form.cleaned_data['correo_electronico']
+    
         try:
-            user = Usuario.objects.create_user(
-                username=form.cleaned_data['matricula'],
-                name_robot=form.cleaned_data['name_robot'],
-                correo_electronico=correo
-            )
-            messages.success(request, 'Robot registrado exitosamente')
-            return redirect('home') 
-            
+            with transaction.atomic():
+                # Crear el usuario
+                user = Usuario.objects.create_user(
+                    username=matricula,
+                    name_robot=name_robot,
+                    correo_electronico=correo,
+                    is_tec_student=form.cleaned_data['is_tec_student']
+                )
+                
+                # Crear el robot asociado al usuario
+                for categoria in categorias:
+                    Robot.objects.create(
+                        nombre=name_robot,
+                        descripcion="Descripción del robot",  # Puedes ajustar la descripción según sea necesario
+                        peso=0.0,  # Puedes ajustar el peso según sea necesario
+                        categoria=categoria,
+                        usuario=user,
+                        fecha_registro=user.date_joined  # Usar la fecha de registro del usuario
+                    )
+                
+                # Guardar el comprobante de pago si se proporciona
+                if comprobante_pago:
+                    user.comprobante_pago = comprobante_pago
+                    user.save()
+                
+                messages.success(request, 'Usuario y Robot registrados exitosamente')
+                return redirect('home') 
+                
         except IntegrityError:
             messages.error(request, 'Esta matrícula o correo ya están registrados')
             return render(request, 'formulario.html', {'form': form})
@@ -75,3 +97,17 @@ def formulario(request):
         except Exception as e:
             messages.error(request, f'Error al registrar: {str(e)}')
             return render(request, 'formulario.html', {'form': form})
+
+# Apartado para jurados y acceso a los torneos   
+def es_jurado(user):
+    return user.groups.filter(name='Jurados').exists()
+
+@user_passes_test(es_jurado)
+def lista_torneos_jurado(request):
+    """Vista para mostrar la lista de torneos disponibles para jurados."""
+    torneos = Torneo.objects.filter(esta_activo=True).order_by('-fecha_inicio')
+    
+    return render(request, 'torneos/lista_torneos_jurado.html', {
+        'torneos': torneos,
+        'titulo': 'Panel de Jurado - Torneos Activos'
+    })
