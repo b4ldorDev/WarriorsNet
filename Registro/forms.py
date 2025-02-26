@@ -63,6 +63,16 @@ class RobotRegistrationForm(forms.Form):
         choices=[('PROFESIONAL', 'Profesional'), ('JUNIOR', 'Junior')],
         widget=forms.Select(attrs={'class': 'form-control'})
     )
+
+    comprobante_pago = forms.ImageField(
+        label='Comprobante de Pago',
+        required=True,
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        }),
+        help_text='Sube una imagen de tu comprobante de pago'
+    )
         
     def clean_categoria(self):
         categoria = self.cleaned_data.get('categoria')
@@ -93,9 +103,15 @@ class RobotRegistrationForm(forms.Form):
             raise ValidationError('El correo electrónico debe ser institucional (@tec.mx)')
         return email
 
+    def clean_comprobante_pago(self):
+        comprobante = self.cleaned_data.get('comprobante_pago')
+        if not comprobante:
+            raise ValidationError('Debes subir un comprobante de pago')
+        return comprobante
+
     def Meta(self):
         model = Usuario
-        fields = ['name_robot', 'matricula', 'correo_electronico', 'is_tec_student']
+        fields = ['name_robot', 'matricula', 'correo_electronico', 'is_tec_student', 'comprobante_pago']
     
     def clean(self):
         cleaned_data = super().clean()
@@ -108,8 +124,8 @@ class RobotRegistrationForm(forms.Form):
             
         if not is_tec_student:
             cleaned_data['matricula'] = None
-        return cleaned_data
-
+        return cleaned_data        
+   
 class JuradoMatchForm(forms.Form):
     ganador = forms.ModelChoiceField(
         queryset=None,

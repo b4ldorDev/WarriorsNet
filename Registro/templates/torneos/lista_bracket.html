@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Torneos Disponibles</h2>
+    <div class="row">
+        {% for torneo in torneos %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ torneo.nombre }}</h5>
+                        <p>Fecha: {{ torneo.fecha_inicio|date:"d/m/Y" }}</p>
+                        <a href="{% url 'ver_bracket' torneo.id %}" class="btn btn-primary">
+                            Ver Bracket
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p>No hay torneos disponibles.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

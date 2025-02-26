@@ -12,6 +12,7 @@ from . models import Usuario, Match, Torneo, Ronda, Robot
 from django.shortcuts import render, redirect, get_object_or_404
 
 def login_view(request):
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -109,7 +110,7 @@ def formulario(request):
         return render(request, 'formulario.html', {'form': form})
     
     elif request.method == 'POST':
-        form = RobotRegistrationForm(request.POST)
+        form = RobotRegistrationForm(request.POST, request.FILES)
         
         if not form.is_valid():
             messages.error(request, 'Por favor, verifica los datos ingresados.')
@@ -121,7 +122,8 @@ def formulario(request):
             user = Usuario.objects.create_user(
                 username=form.cleaned_data['matricula'],
                 name_robot=form.cleaned_data['name_robot'],
-                correo_electronico=correo
+                correo_electronico=correo,
+                comprobante_pago=form.cleaned_data['comprobante_pago']
             )
             messages.success(request, 'Robot registrado exitosamente')
             return redirect('home') 
@@ -133,6 +135,7 @@ def formulario(request):
         except Exception as e:
             messages.error(request, f'Error al registrar: {str(e)}')
             return render(request, 'formulario.html', {'form': form})
+
       
     #APartado para jurados y acceso a los torneos   
 def es_jurado(user):

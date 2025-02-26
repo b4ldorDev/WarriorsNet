@@ -11,8 +11,11 @@ class Usuario(AbstractUser):
     is_tec_student = models.BooleanField(default=False)
     profesional = models.BooleanField(default=False)
     junior = models.BooleanField(default=False)
+    comprobante_pago = models.ImageField(upload_to='comprobantes/', null=True, blank=True)
+    pago_verificado = models.BooleanField(default=False)
     # No sé luego lo hago chido 
 
+# Rest of the original models remain exactly the same
 class Robot(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
