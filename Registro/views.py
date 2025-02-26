@@ -1,13 +1,13 @@
-from django.shortcuts import render, HttpResponse, redirect 
+from django.shortcuts import render, HttpResponse, redirect , get_object_or_404
 from django.contrib.auth.forms import UserCreationForm 
 from django.contrib.auth.models import User 
-from . forms import RobotRegistrationForm
-from . models import Usuario, Match, Torneo, Ronda, Robot
-from django.db import IntegrityError
+from .forms import RobotRegistrationForm
+from .models import Usuario, Match, Torneo, Ronda, Robot
+from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.db.models import Q
-from django.contrib.auth.decorators import user_passes_test
-from django.db import transaction
+from django.contrib.auth.decorators import user_passes_test, login_required
+from .forms import RobotRegistrationForm
 
 def home(request):
     return render(request, 'home.html')
@@ -97,6 +97,25 @@ def formulario(request):
         except Exception as e:
             messages.error(request, f'Error al registrar: {str(e)}')
             return render(request, 'formulario.html', {'form': form})
+
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def generar_rondas(request):
+    if request.method == 'POST':
+        torneo_id = request.POST.get('torneo_id')
+        torneo = get_object_or_404(Torneo, id=torneo_id)
+        torneo.generar_rondas()
+        messages.success(request, 'Rondas generadas exitosamente')
+        return redirect('panel_rondas')
+
+    torneos = Torneo.objects.filter(esta_activo=True)
+    return render(request, 'generar_rondas.html', {'torneos': torneos})
+
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def panel_rondas(request):
+    rondas = Ronda.objects.all()
+    return render(request, 'panel_rondas.html', {'rondas': rondas})
 
 # Apartado para jurados y acceso a los torneos   
 def es_jurado(user):

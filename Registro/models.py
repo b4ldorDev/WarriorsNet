@@ -1,7 +1,8 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-from django.db import transaction
+from django.core.mail import send_mail
+import random
 
 class Usuario(AbstractUser):
     name_robot = models.CharField(max_length=100)
@@ -26,6 +27,21 @@ class Robot(models.Model):
     class Meta:
         ordering = ['-fecha_registro']
 
+class Ronda(models.Model):
+    torneo = models.ForeignKey('Torneo', on_delete=models.CASCADE, related_name='rondas')
+    numero_ronda = models.PositiveIntegerField()
+    hora_inicio = models.DateTimeField()
+    hora_fin = models.DateTimeField()
+    lugar = models.CharField(max_length=255)
+
+class Match(models.Model):
+    ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
+    robot1 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot1')
+    robot2 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot2', null=True, blank=True)
+    ganador = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_ganados', null=True, blank=True)
+    hora_programada = models.DateTimeField()
+    esta_completo = models.BooleanField(default=False)
+
 class Torneo(models.Model):
     nombre = models.CharField(max_length=200)
     fecha_inicio = models.DateTimeField()
@@ -42,8 +58,8 @@ class Torneo(models.Model):
         ordering = ['-fecha_inicio']
 
     def generar_rondas(self):
-        robots_profesional = list(Robot.objects.filter(categoria='PROFESIONAL', matches_como_robot1__ronda__torneo=self).distinct())
-        robots_junior = list(Robot.objects.filter(categoria='JUNIOR', matches_como_robot1__ronda__torneo=self).distinct())
+        robots_profesional = list(Robot.objects.filter(categoria='PROFESIONAL', usuario__robots__torneo=self).distinct())
+        robots_junior = list(Robot.objects.filter(categoria='JUNIOR', usuario__robots__torneo=self).distinct())
 
         for robots in [robots_profesional, robots_junior]:
             if len(robots) < 2:
@@ -59,7 +75,8 @@ class Torneo(models.Model):
                 torneo=self,
                 numero_ronda=1,
                 hora_inicio=self.fecha_inicio,
-                hora_fin=self.fecha_inicio + timezone.timedelta(hours=2)
+                hora_fin=self.fecha_inicio + timezone.timedelta(hours=2),
+                lugar=self.ubicacion
             )
             random.shuffle(robots)
             matches_primera_ronda = []
@@ -82,44 +99,21 @@ class Torneo(models.Model):
                         hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
                     )
                     matches_primera_ronda.append(match)
-            for num_ronda in range(2, num_rondas + 1):
-                nueva_ronda = Ronda.objects.create(
-                    torneo=self,
-                    numero_ronda=num_ronda,
-                    hora_inicio=self.fecha_inicio + timezone.timedelta(days=num_ronda-1),
-                    hora_fin=self.fecha_inicio + timezone.timedelta(days=num_ronda-1, hours=2)
-                )
-class Ronda(models.Model):
-    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='rondas')
-    numero_ronda = models.IntegerField()
-    hora_inicio = models.DateTimeField()
-    hora_fin = models.DateTimeField()
-    esta_completa = models.BooleanField(default=False)
+            
+            for match in matches_primera_ronda:
+                self._enviar_correo_asignacion(match)
 
-    def __str__(self):
-        return f"Ronda {self.numero_ronda} - {self.torneo.nombre}"
+    def _enviar_correo_asignacion(self, match):
+        subject = 'Asignación de Ronda para tu Robot'
+        message = f'Tu robot {match.robot1.nombre} ha sido asignado para una ronda en el torneo {self.nombre}.'
+        if match.robot2:
+            message += f' Competirá contra el robot {match.robot2.nombre}.'
+        message += f'\n\nDetalles de la ronda:\nLugar: {match.ronda.lugar}\nFecha y Hora: {match.hora_programada}'
+        send_mail(subject, message, 'no-reply@example.com', [match.robot1.usuario.correo_electronico])
+        if match.robot2:
+            send_mail(subject, message, 'no-reply@example.com', [match.robot2.usuario.correo_electronico])
 
-    class Meta:
-        ordering = ['numero_ronda']
-        unique_together = ['torneo', 'numero_ronda']
-
-
-
-class Match(models.Model):
-    ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
-    robot1 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot1')
-    robot2 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot2')
-    ganador = models.ForeignKey(Robot, on_delete=models.SET_NULL, null=True, related_name='matches_ganados')
-    hora_programada = models.DateTimeField()
-    esta_completo = models.BooleanField(default=False)
-    descripcion_resultado = models.TextField(blank=True)
-
-    def __str__(self):
-        return f"{self.robot1.nombre} vs {self.robot2.nombre}"
-
-    class Meta:
-        verbose_name_plural = 'matches'
-        ordering = ['hora_programada']
+#No chambeado 
 
 class Notificacion(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='notificaciones')

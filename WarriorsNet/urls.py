@@ -26,4 +26,7 @@ urlpatterns = [
     path('torneo/', views.torneo, name='torneo'),  
     path('matches/', views.match_list, name='matches'),  
     path('bracket/<int:torneo_id>/', views.ver_bracket, name='ver_bracket'),    
+    path('generar_rondas/', views.generar_rondas, name='generar_rondas'),
+    path('panel_rondas/', views.panel_rondas, name='panel_rondas'),
+    path('lista_torneos_jurado/', views.lista_torneos_jurado, name='lista_torneos_jurado'),    
 ]

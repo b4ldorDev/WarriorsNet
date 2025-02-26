@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Panel de Rondas</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Torneo</th>
+                    <th>Ronda</th>
+                    <th>Fecha y Hora de Inicio</th>
+                    <th>Fecha y Hora de Fin</th>
+                    <th>Lugar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ronda in rondas %}
+                    <tr>
+                        <td>{{ ronda.torneo.nombre }}</td>
+                        <td>{{ ronda.numero_ronda }}</td>
+                        <td>{{ ronda.hora_inicio }}</td>
+                        <td>{{ ronda.hora_fin }}</td>
+                        <td>{{ ronda.lugar }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

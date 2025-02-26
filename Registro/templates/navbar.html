@@ -26,9 +26,9 @@
         <a class="nav-link" href="{% url 'formulario' %}">Formulario</a>
       </li>
       <li
-        class="nav-item {% if request.resolver_match.view_name == 'matches' %}active{% endif %}"
+        class="nav-item {% if request.resolver_match.view_name == 'panel_rondas' %}active{% endif %}"
       >
-        <a class="nav-link" href="{% url 'matches' %}">matches</a>
+        <a class="nav-link" href="{% url 'panel_rondas' %}"> panel de rondas</a>
       </li>    
     </ul>
   </div>
