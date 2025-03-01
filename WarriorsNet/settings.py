@@ -13,7 +13,6 @@ import os
 import dj_database_url
 from pathlib import Path
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,6 +27,13 @@ SECRET_KEY = 'django-insecure-u!2$a=09l4kh*i#)n_1t40#&z6-vi8ieup45owen6(hys4oo+h
 DEBUG =  True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*.render.com','WarriorsNet.render.com']
 AUTH_USER_MODEL = 'Registro.Usuario'
+
+#Config de Autenticación 
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/generar_rondas/'
+LOGOUT_REDIRECT_URL = '/'
+
+
 
 # Application definition
 
@@ -51,8 +57,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
 ]
 
 ROOT_URLCONF = 'WarriorsNet.urls'
@@ -60,7 +64,7 @@ ROOT_URLCONF = 'WarriorsNet.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR/ 'Registro/templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,9 +97,6 @@ DATABASES = {
     )
 }
 """
-
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
 
 # Configuración de base de datos
 if 'DATABASE_URL' in os.environ:
@@ -145,15 +146,22 @@ USE_I18N = True
 
 USE_TZ = True
 
+#EMAILS
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.example.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@example.com'
+EMAIL_HOST_PASSWORD = 'your-email-password'
+DEFAULT_FROM_EMAIL = 'no-reply@example.com'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  
-]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

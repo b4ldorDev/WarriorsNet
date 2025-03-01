@@ -15,12 +15,11 @@ class Usuario(AbstractUser):
     pago_verificado = models.BooleanField(default=False)
     # No sé luego lo hago chido 
 
-# Rest of the original models remain exactly the same
 class Robot(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     peso = models.FloatField()
-    categoria = models.CharField(max_length=50)
+    categoria = models.CharField(max_length=50)  # 'PROFESIONAL' o 'JUNIOR'
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='robots')
     fecha_registro = models.DateTimeField(auto_now_add=True)
     
@@ -38,6 +37,8 @@ class Torneo(models.Model):
     descripcion = models.TextField()
     esta_activo = models.BooleanField(default=True)
     administrador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='torneos_administrados')
+    # Agregamos relación para inscribir robots directamente a un torneo
+    robots_inscritos = models.ManyToManyField(Robot, related_name='torneos', blank=True)
 
     def __str__(self):
         return self.nombre
@@ -46,46 +47,54 @@ class Torneo(models.Model):
         ordering = ['-fecha_inicio']
 
     def generar_rondas(self):
-        robots_profesional = list(Robot.objects.filter(categoria='PROFESIONAL', matches_como_robot1__ronda__torneo=self).distinct())
-        robots_junior = list(Robot.objects.filter(categoria='JUNIOR', matches_como_robot1__ronda__torneo=self).distinct())
 
-        for robots in [robots_profesional, robots_junior]:
+        robots_profesional = list(self.robots_inscritos.filter(categoria='PROFESIONAL'))
+        robots_junior = list(self.robots_inscritos.filter(categoria='JUNIOR'))
+        
+        self.rondas.all().delete()
+
+        for categoria, robots in [('PROFESIONAL', robots_profesional), ('JUNIOR', robots_junior)]:
             if len(robots) < 2:
-                continue
-            self._crear_rondas_para_categoria(robots)
+                continue  
+                
+            self._crear_rondas_para_categoria(robots, categoria)
 
-    def _crear_rondas_para_categoria(self, robots):
+    def _crear_rondas_para_categoria(self, robots, categoria):
         with transaction.atomic():
-            self.rondas.all().delete()
             num_robots = len(robots)
-            num_rondas = (num_robots - 1).bit_length()
+            num_rondas = (num_robots - 1).bit_length()  # Calcula cuántas rondas necesitamos
+            
             primera_ronda = Ronda.objects.create(
                 torneo=self,
                 numero_ronda=1,
                 hora_inicio=self.fecha_inicio,
                 hora_fin=self.fecha_inicio + timezone.timedelta(hours=2)
             )
-            random.shuffle(robots)
+            
+            random.shuffle(robots)  # Mezclamos los robots para emparejarlos al azar
+            
             matches_primera_ronda = []
-            for i in range(0, len(robots), 2):
-                if i + 1 < len(robots):
+            # Crear matches para la primera ronda
+            for i in range(0, num_robots, 2):
+                if i + 1 < num_robots:  # Tenemos un par de robots
                     match = Match.objects.create(
                         ronda=primera_ronda,
                         robot1=robots[i],
                         robot2=robots[i + 1],
                         hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
                     )
-                    matches_primera_ronda.append(match)
-                else:
+                else:  # Un robot sin pareja, pasa automáticamente
                     match = Match.objects.create(
                         ronda=primera_ronda,
                         robot1=robots[i],
-                        robot2=None,
-                        ganador=robots[i],
+                        robot2=None,  # Sin rival
+                        ganador=robots[i],  # Gana automáticamente
                         esta_completo=True,
                         hora_programada=self.fecha_inicio + timezone.timedelta(minutes=30 * (i // 2))
                     )
-                    matches_primera_ronda.append(match)
+                matches_primera_ronda.append(match)
+            
+            # Crear las siguientes rondas (inicialmente vacías)
             for num_ronda in range(2, num_rondas + 1):
                 nueva_ronda = Ronda.objects.create(
                     torneo=self,
@@ -93,64 +102,49 @@ class Torneo(models.Model):
                     hora_inicio=self.fecha_inicio + timezone.timedelta(days=num_ronda-1),
                     hora_fin=self.fecha_inicio + timezone.timedelta(days=num_ronda-1, hours=2)
                 )
-                num_matches = len(matches_primera_ronda) // 2
+                
+                num_matches = 2 ** (num_rondas - num_ronda)  # Número de matches en esta ronda
                 for i in range(num_matches):
                     Match.objects.create(
                         ronda=nueva_ronda,
-                        robot1=None,
-                        robot2=None,
+                        robot1=None,  # Se llenará después
+                        robot2=None,  # Se llenará después
                         hora_programada=nueva_ronda.hora_inicio + timezone.timedelta(minutes=30 * i)
                     )
 
-def actualizar_bracket(match):
-    if not match.esta_completo or not match.ganador:
-        return
-        
-    ronda_actual = match.ronda
-    siguiente_ronda = Ronda.objects.filter(
-        torneo=ronda_actual.torneo,
-        numero_ronda=ronda_actual.numero_ronda + 1
-    ).first()
-    
-    if siguiente_ronda:
-        matches_actuales = list(match.ronda.matches.order_by('id'))
-        indice_actual = matches_actuales.index(match)
-        siguiente_indice = indice_actual // 2
-        
-        siguiente_match = siguiente_ronda.matches.all().order_by('id')[siguiente_indice]
-        
-        if indice_actual % 2 == 0:
-            siguiente_match.robot1 = match.ganador
-        else:
-            siguiente_match.robot2 = match.ganador
-        
-        siguiente_match.save()
-
 class Ronda(models.Model):
-    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='rondas')
+    CATEGORIA_CHOICES = [
+        ('PROFESIONAL', 'Profesional'),
+        ('JUNIOR', 'Junior'),
+    ]
+    
+    torneo = models.ForeignKey(Torneo, related_name='rondas', on_delete=models.CASCADE)
     numero_ronda = models.IntegerField()
-    hora_inicio = models.DateTimeField()
-    hora_fin = models.DateTimeField()
     esta_completa = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Ronda {self.numero_ronda} - {self.torneo.nombre}"
-
+    hora_inicio = models.DateTimeField(null=True, blank=True)
+    hora_fin = models.DateTimeField(null=True, blank=True)
+    lugar = models.CharField(max_length=100, blank=True)
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, default='PROFESIONAL')
+    
     class Meta:
-        ordering = ['numero_ronda']
-        unique_together = ['torneo', 'numero_ronda']
+        unique_together = ('torneo', 'numero_ronda', 'categoria')
+        
+    def __str__(self):
+        return f"Ronda {self.numero_ronda} - {self.torneo.nombre} - {self.get_categoria_display()}"
 
 class Match(models.Model):
     ronda = models.ForeignKey(Ronda, on_delete=models.CASCADE, related_name='matches')
-    robot1 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot1')
-    robot2 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot2')
+    robot1 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot1', null=True)
+    robot2 = models.ForeignKey(Robot, on_delete=models.CASCADE, related_name='matches_como_robot2', null=True)
     ganador = models.ForeignKey(Robot, on_delete=models.SET_NULL, null=True, related_name='matches_ganados')
     hora_programada = models.DateTimeField()
     esta_completo = models.BooleanField(default=False)
     descripcion_resultado = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.robot1.nombre} vs {self.robot2.nombre}"
+        robot1_nombre = self.robot1.nombre if self.robot1 else "TBD"
+        robot2_nombre = self.robot2.nombre if self.robot2 else "TBD"
+        return f"{robot1_nombre} vs {robot2_nombre}"
 
     class Meta:
         verbose_name_plural = 'matches'
@@ -174,8 +168,34 @@ class Notificacion(models.Model):
     class Meta:
         ordering = ['programada_para']
 
-def ver_bracket(request, torneo_id):
-    torneo = Torneo.objects.get(id=torneo_id)
-    rondas = torneo.rondas.all().prefetch_related('matches')
-    context = {'torneo': torneo, 'rondas': rondas}
-    return render(request, 'torneos/bracket.html', context)
+def actualizar_bracket(match):
+    """
+    Actualiza el bracket después de que un match ha sido completado.
+    Mueve al ganador a la siguiente ronda.
+    """
+    if not match.esta_completo or not match.ganador:
+        return
+        
+    ronda_actual = match.ronda
+    siguiente_ronda = Ronda.objects.filter(
+        torneo=ronda_actual.torneo,
+        categoria=ronda_actual.categoria,  # Asegura que sea la misma categoría
+        numero_ronda=ronda_actual.numero_ronda + 1
+    ).first()
+    
+    if siguiente_ronda:
+        matches_actuales = list(match.ronda.matches.order_by('id'))
+        indice_actual = matches_actuales.index(match)
+        siguiente_indice = indice_actual // 2
+        
+        siguientes_matches = list(siguiente_ronda.matches.order_by('id'))
+        if siguiente_indice < len(siguientes_matches):
+            siguiente_match = siguientes_matches[siguiente_indice]
+            
+            # Determinar si el ganador va como robot1 o robot2
+            if indice_actual % 2 == 0:
+                siguiente_match.robot1 = match.ganador
+            else:
+                siguiente_match.robot2 = match.ganador
+            
+            siguiente_match.save()
