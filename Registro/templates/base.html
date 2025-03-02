@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warriors Net</title>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;700&family=Play:wght@400;700&display=swap" rel="stylesheet">    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" />
+    
+   <style>
+        /* Global styles */
+        body {
+            background-color: #0f0c29;
+            color: #ffffff;
+            font-family: "Josefin Sans", sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 2rem 1rem;
+        }
+
+        /* Navbar styles (previous styles maintained) */
+        .navbar {
+            background: linear-gradient(90deg, #0f0c29, #302b63, #24243e);
+            border-bottom: 1px solid rgba(0, 191, 231, 0.3);
+            padding: 20px 0;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 191, 231, 0.2);
+            backdrop-filter: blur(8px);
+            background-size: 200% 200%;
+            animation: gradientFlow 15s ease infinite;
+        }
+        
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .navbar-brand {
+            color: #ffffff;
+            font-family: "Play", sans-serif;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 191, 231, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            color: #00bfe7;
+            text-shadow: 0 0 15px rgba(0, 191, 231, 0.8);
+        }
+        
+        .navbar-nav .nav-link {
+            color: #ffffff;
+            font-family: "Play", sans-serif;
+            font-size: 15px;
+            text-transform: uppercase;
+            padding: 6px 0;
+            margin: 0 25px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:after {
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00bfe7, transparent);
+            content: "";
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover:after,
+        .navbar-nav .nav-link.active:after {
+            transform: scaleX(1);
+        }
+        
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Play", sans-serif;
+            color: #00bfe7;
+            text-shadow: 0 0 10px rgba(0, 191, 231, 0.3);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        h1::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(180deg, #00bfe7, transparent);
+        }
+
+        /* Paragraphs */
+        p {
+            color: #e0e0e0;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        /* Form elements */
+        .form-control {
+            background: rgba(48, 43, 99, 0.3);
+            border: 1px solid rgba(0, 191, 231, 0.2);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(48, 43, 99, 0.5);
+            border-color: #00bfe7;
+            box-shadow: 0 0 15px rgba(0, 191, 231, 0.2);
+            color: #ffffff;
+        }
+
+        .form-label {
+            color: #00bfe7;
+            font-family: "Play", sans-serif;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: "Play", sans-serif;
+            text-transform: uppercase;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #302b63, #24243e);
+            border: 1px solid #00bfe7;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #24243e, #302b63);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 191, 231, 0.3);
+        }
+
+        /* Tables */
+        .table {
+            color: #ffffff;
+            background: rgba(48, 43, 99, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: rgba(0, 191, 231, 0.1);
+        }
+
+        .table th {
+            font-family: "Play", sans-serif;
+            color: #00bfe7;
+            border-color: rgba(0, 191, 231, 0.2);
+        }
+
+        .table td {
+            border-color: rgba(0, 191, 231, 0.1);
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(48, 43, 99, 0.3);
+            border: 1px solid rgba(0, 191, 231, 0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .card-header {
+            background: rgba(0, 191, 231, 0.1);
+            border-bottom: 1px solid rgba(0, 191, 231, 0.2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 991px) {
+            .navbar-nav .nav-link {
+                margin: 10px 0;
+            }
+            
+            .navbar-collapse {
+                background: rgba(15, 12, 41, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

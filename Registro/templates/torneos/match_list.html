@@ -1,0 +1,71 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Enfrentamientos de Robots</h1>
+    
+    <!-- Formulario de búsqueda -->
+    <form method="GET" class="mb-4">
+        <div class="input-group">
+            <input type="text" 
+                   class="form-control" 
+                   name="nombre_robot" 
+                   placeholder="Buscar robot por nombre..."
+                   value="{{ search_query }}">
+            <button class="btn btn-primary" type="submit">
+                Buscar
+            </button>
+        </div>
+    </form>
+
+    <!-- Lista de matches -->
+    {% if matches %}
+        <div class="row">
+            {% for match in matches %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                {{ match.ronda.torneo.nombre }} - Ronda {{ match.ronda.numero_ronda }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-around align-items-center mb-3">
+                                <div class="text-center">
+                                    <h4>{{ match.robot1.nombre }}</h4>
+                                    <small class="text-muted">Categoría: {{ match.robot1.categoria }}</small>
+                                </div>
+                                <div class="vs-text">VS</div>
+                                <div class="text-center">
+                                    <h4>{{ match.robot2.nombre }}</h4>
+                                    <small class="text-muted">Categoría: {{ match.robot2.categoria }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="match-info">
+                                <p class="mb-1">
+                                    <i class="fas fa-calendar-alt"></i> 
+                                    {{ match.hora_programada|date:"d M Y H:i" }}
+                                </p>
+                                {% if match.ganador %}
+                                    <div class="alert alert-success mt-3">
+                                        Ganador: {{ match.ganador.nombre }}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning mt-3">
+                                        Enfrentamiento pendiente
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No se encontraron enfrentamientos para este robot.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

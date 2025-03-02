@@ -1,0 +1,8 @@
+db.sqlite3
+venv
+__pycache__
+ROBOHACKS-WEB/
+ROBOHACKS-WEB/
+__pycache__/
+*.py[cod]
+*.class

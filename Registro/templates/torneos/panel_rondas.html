@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Panel de Administración de Rondas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ titulo }}</h1>
+    
+    <div class="card">
+        <div class="card-header">
+            <h5>Rondas de Torneos</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Torneo</th>
+                        <th>Ronda</th>
+                        <th>Fecha y Hora de Inicio</th>
+                        <th>Fecha y Hora de Fin</th>
+                        <th>¿Completa?</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ronda in rondas %}
+                        <tr>
+                            <td>{{ ronda.torneo.nombre }}</td>
+                            <td>{{ ronda.numero_ronda }}</td>
+                            <td>{{ ronda.hora_inicio }}</td>
+                            <td>{{ ronda.hora_fin }}</td>
+                            <td>
+                                {% if ronda.esta_completa %}
+                                    <span class="badge bg-success">Completa</span>
+                                {% else %}
+                                    <span class="badge bg-warning">En progreso</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'ver_bracket' ronda.torneo.id %}" class="btn btn-sm btn-primary">Ver Bracket</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay rondas disponibles</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

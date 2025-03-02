@@ -1,0 +1,35 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Bracket: {{ torneo.nombre }}</h1>
+    <div class="bracket">
+        {% for ronda in rondas %}
+            <div class="ronda">
+                <h5>Ronda {{ ronda.numero_ronda }}</h5>
+                {% for match in ronda.matches.all %}
+                    <div class="match-card">
+                        <div class="robot">{{ match.robot1.nombre|default:"BYE" }}</div>
+                        <div class="vs">VS</div>
+                        <div class="robot">{{ match.robot2.nombre|default:"BYE" }}</div>
+                        {% if match.ganador %}
+                            <div class="ganador">🏆 {{ match.ganador.nombre }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .bracket { display: flex; gap: 2rem; padding: 1rem; overflow-x: auto; }
+    .ronda { min-width: 300px; border-right: 2px solid #eee; padding: 0 1rem; }
+    .match-card { 
+        background: #f8f9fa; border: 1px solid #dee2e6; 
+        padding: 1rem; margin-bottom: 1rem; border-radius: 8px; 
+    }
+    .vs { color: #6c757d; margin: 0.5rem 0; }
+    .ganador { color: #28a745; font-weight: bold; }
+</style>
+{% endblock %}
