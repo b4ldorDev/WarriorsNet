@@ -123,13 +123,36 @@ else:
         }
     }
 """
+#Verisón normal 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost/postgres',
+        default='postgresql://warriors_net_user:O45WeLflQGw0RnhwhwrZ1nNeX8GuIiE9@dpg-cv312uogph6c73cm0s60-a/warriors_net',
         conn_max_age=600
     )
 }
 
+"""
+if 'postgresql://warriors_net_user:O45WeLflQGw0RnhwhwrZ1nNeX8GuIiE9@dpg-cv312uogph6c73cm0s60-a/warriors_net' in os.environ:
+    # Estamos en Render o similar
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get(''),
+            conn_max_age=600
+        )
+    }
+else:
+    # Configuración local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'nombre_de_tu_db',
+            'USER': 'usuario',
+            'PASSWORD': 'contraseña',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
+"""
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
