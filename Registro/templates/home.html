@@ -50,7 +50,6 @@
         </div>
     </div>
 
-    <!-- Objetivo Section -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="cyber-card">
@@ -65,7 +64,6 @@
         </div>
     </div>
 
-    <!-- Participaciones Section -->
     <div class="row">
         <div class="col-md-6">
             <div class="cyber-card">
@@ -96,6 +94,12 @@
                       con el prototipo Teus.</li>
                 </ul>
             </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'formulario' %}" class="btn btn-primary btn-lg cyber-button">Ir al Formulario</a>
         </div>
     </div>
 </div>
@@ -178,9 +182,9 @@
     }
 
     .carousel-item img {
-        width: 1000px; /* Ancho deseado */
-        height: 400px; /* Alto deseado */
-        object-fit: cover; /* o contain, o fill según tu preferencia */
+        width: 1000px; 
+        height: 400px; 
+        object-fit: cover; 
     }
 
     @media (max-width: 768px) {
@@ -195,6 +199,22 @@
         .cyber-caption {
             padding: 1rem;
         }
+    }
+
+    .cyber-button {
+        background: linear-gradient(90deg, #00bfe7, #302b63);
+        border: none;
+        border-radius: 5px;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(0, 191, 231, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .cyber-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(0, 191, 231, 0.3);
     }
 </style>
 {% endblock %}
